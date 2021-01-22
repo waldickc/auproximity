@@ -233,8 +233,7 @@ export default class ServerDisplayer extends Vue {
     if (payload.group === RoomGroup.Spectator) {
       if (payload.uuid === this.$store.state.me.uuid) {
         this.remoteStreams.forEach(s => {
-          s.gainNode.gain.value = 1
-          s.pannerNode.setPosition(0, 0, 0)
+          s.gainNode.gain.value = 0
         })
       } else if (this.$store.state.me.group === RoomGroup.Main) {
         const stream = this.remoteStreams.find(s => s.uuid === payload.uuid)
@@ -243,8 +242,7 @@ export default class ServerDisplayer extends Vue {
       } else if (this.$store.state.me.group === RoomGroup.Spectator) {
         const stream = this.remoteStreams.find(s => s.uuid === payload.uuid)
         if (!stream) return
-        stream.gainNode.gain.value = 1
-        stream.pannerNode.setPosition(0, 0, 0)
+        stream.gainNode.gain.value = 0
       } else if (this.$store.state.me.group === RoomGroup.Muted) {
         const stream = this.remoteStreams.find(s => s.uuid === payload.uuid)
         if (!stream) return
@@ -273,13 +271,15 @@ export default class ServerDisplayer extends Vue {
 
   @Socket(ClientSocketEvents.SetPose)
   onSetPose (payload: { uuid: string; pose: Pose }) {
-    if (this.$store.state.me.group === RoomGroup.Main) {
+    if (this.$store.state.me.group === RoomGroup.Main || this.$store.state.me.group === RoomGroup.Spectator) {
       if (payload.pose.x === 0 && payload.pose.y === 0) {
         this.remoteStreams.forEach(s => {
           const client: ClientModel = this.$store.state.clients.find((c: ClientModel) => c.uuid === s.uuid)
-          if (client && client.group === RoomGroup.Main) {
+          if (client && (client.group === RoomGroup.Main || this.$store.state.me.group === client.group)) {
             s.gainNode.gain.value = 1
             s.pannerNode.setPosition(0, 0, 0)
+          } else if (client) {
+            s.gainNode.gain.value = 0
           }
         })
       } else {
@@ -303,22 +303,31 @@ export default class ServerDisplayer extends Vue {
   }
 
   recalcVolumeForRemoteStream (stream: { uuid: string; gainNode: GainNode; pannerNode: PannerNode }) {
-    const client: ClientModel = this.$store.state.clients.find((c: ClientModel) => c.uuid === stream.uuid)
-    if (!client) return
-    // Only change if they are in RoomGroup.Main
-    if (client.group === RoomGroup.Main) {
-      const p1 = this.$store.state.me.pose
-      const p2 = client.pose
-
-      if (this.poseCollide(p1, p2) && this.$store.state.options.colliders) {
+    const p2: ClientModel = this.$store.state.clients.find((c: ClientModel) => c.uuid === stream.uuid)
+    if (!p2) return
+    const p1 = this.$store.state.me
+    if (p1.group === RoomGroup.Main) {
+      if (p2.group === RoomGroup.Main) {
+        if (this.$store.state.options.colliders && this.poseCollide(p1.pose, p2.pose)) {
+          stream.gainNode.gain.value = 0
+        } else {
+          stream.gainNode.gain.value = this.lerp(this.hypotPose(p1.pose, p2.pose))
+          stream.pannerNode.setPosition(p2.pose.x - p1.pose.x, p2.pose.y - p1.pose.y, 1)
+        }
+      } else {
+        stream.gainNode.gain.value = 0
+      }
+    } else {
+      if (p2.group === RoomGroup.Muted) {
         stream.gainNode.gain.value = 0
       } else {
-        stream.gainNode.gain.value = this.lerp(this.hypotPose(p1, p2))
-        stream.pannerNode.setPosition(p2.x - p1.x, p2.y - p1.y, 1)
+        if (this.$store.state.options.colliders && this.poseCollide(p1.pose, p2.pose)) {
+          stream.gainNode.gain.value = 0
+        } else {
+          stream.gainNode.gain.value = this.lerp(this.hypotPose(p1.pose, p2.pose))
+          stream.pannerNode.setPosition(p2.pose.x - p1.pose.x, p2.pose.y - p1.pose.y, 1)
+        }
       }
-    } else if (client.group === RoomGroup.Spectator || client.group === RoomGroup.Muted) {
-      // If they are spectator or muted
-      stream.gainNode.gain.value = 0
     }
   }
 
