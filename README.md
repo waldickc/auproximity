@@ -8,7 +8,7 @@ I have an open instance hosted on [Heroku](https://auproxy.herokuapp.com).
 
 This software should be used for personal use on public lobbies. Anyone that wants to
 have a custom solution, private server, or other commercial use for this software should 
-send a direct message to `Cybershard#3935` on Discord. This software comes with NO warranty.
+send a direct message to `Cybershard#0001` on Discord. This software comes with NO warranty.
 
 ## Features
 - The software can connect to a public game to host proximity voice services
@@ -36,6 +36,9 @@ Follow the steps below to run a server and webui with hot-reload
 > Note: The `heroku-postbuild` script is for Heroku deployment only.
 > Do NOT use it for development or production testing, as it WILL break.
 
+## Selfhosting - Heroku
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 ## Selfhosting - Docker images
 I provide docker images to quickly setup a instance on a server or local development machine.
 There are two images: the stable release image, and the development image.
@@ -44,7 +47,7 @@ There are two images: the stable release image, and the development image.
 
 #### Setup instructions
  - Download the image as explained in the previous section.
- - Start up a container with `docker run -d auproxy:{tag} -p {port}:8079`,
+ - Start up a container with `docker run -d -p {port}:8079 cybershard/auproxy:{tag} `,
    replacing `tag` with `latest` or `dev` respectively, and `port` with whatever port you would like.
  - Choose your favorite SSL reverse proxy to put in front of the container, like NGINX or Traefik.
    Make sure to forward https traffic to the `port` that you chose in the previous step.

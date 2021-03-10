@@ -1,6 +1,6 @@
 {
   "name": "auproximity-server",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "Proximity Voice Server",
   "author": "cybershard",
   "contributors": [
@@ -11,17 +11,22 @@
     "serve": "nodemon ./src/main.ts",
     "build": "cross-env NODE_ENV=production tsc -p ./",
     "build:docker": "docker build -t auproxy-backend .",
-    "start": "node ./dist/src/main.js",
+    "start": "node ./dist/main.js",
     "lint": "eslint ./src/**/*.ts --fix",
-    "heroku-postbuild": "yarn build && YARN_PRODUCTION=false yarn --cwd auproximity-webui install && yarn --cwd auproximity-webui build && mkdir dist/src/dist && cp -r auproximity-webui/dist dist/src"
+    "heroku-postbuild": "yarn build && YARN_PRODUCTION=false yarn --cwd auproximity-webui install && yarn --cwd auproximity-webui build && mkdir -p dist/dist && cp -r auproximity-webui/dist dist"
   },
   "dependencies": {
     "@microsoft/signalr": "^5.0.0",
+    "@skeldjs/client": "^2.2.23",
+    "@skeldjs/common": "^2.2.23",
+    "@skeldjs/constant": "^2.2.18",
+    "@skeldjs/protocol": "^2.2.18",
+    "chalk": "^4.1.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "heroku-ssl-redirect": "^0.1.1",
     "lodash": "^4.17.20",
-    "peer": "^0.5.3",
+    "peer": "^0.6.1",
     "socket.io": "^3.0.1",
     "tslib": "^2.0.3",
     "uuid": "^8.3.1"

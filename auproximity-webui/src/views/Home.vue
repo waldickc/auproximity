@@ -1,10 +1,13 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" md="6">
-        <ServerConnector @joinroom="joinRoom($event)"/>
+      <v-col cols="12" md="4">
+        <ServerConnector @joinroom="joinRoom($event)" />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col  cols="12" md="4">
+        <ClientOptions />
+      </v-col>
+      <v-col cols="12" md="4">
         <ServerDisplayer />
       </v-col>
     </v-row>
@@ -25,12 +28,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { BackendModel } from '@/models/BackendModel'
-import ClientSocketEvents from '@/models/ClientSocketEvents'
+import { ClientSocketEvents } from '@/models/ClientSocketEvents'
 import ServerConnector from '@/components/ServerConnector.vue'
 import ServerDisplayer from '@/components/ServerDisplayer.vue'
 import Tutorial from '@/components/Tutorial.vue'
 import DiscordServer from '@/components/DiscordServer.vue'
 import GithubStar from '@/components/GithubStar.vue'
+import ClientOptions from '@/components/ClientOptions.vue'
 import consts from '@/consts'
 
 @Component({
@@ -39,7 +43,8 @@ import consts from '@/consts'
     DiscordServer,
     Tutorial,
     ServerConnector,
-    ServerDisplayer
+    ServerDisplayer,
+    ClientOptions
   }
 })
 export default class Home extends Vue {
